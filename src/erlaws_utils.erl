@@ -13,8 +13,6 @@
   http_response/2
 ]).
 
--define(DEFAULT_CHUNK_SIZE, 1048576).
-
 %%====================================================================
 %% @doc Utilities
 %%====================================================================
@@ -43,16 +41,4 @@ http_response(ConnPid, Response) ->
       {ok, #{status_code => StatusCode, headers => RespHeaders, body => Body}};
     Error ->
       Error
-  end.
-
-chunk_send_body(ConnPid, Fid, ChunkSize, Offset, ContentSize) ->
-  NextContentSize = ContentSize - ChunkSize,
-  NextOffset = Offset + ChunkSize,
-  if NextContentSize < 1 ->
-    {ok, Bytes} = file:pread(Fid, [{Offset, ContentSize}]),
-    ok = hackney:send_body(ConnPid, Bytes);
-  true ->
-    {ok, Bytes} = file:pread(Fid, [{Offset, ChunkSize}]),
-    ok = hackney:send_body(ConnPid, Bytes),
-    chunk_send_body(ConnPid, Fid, ChunkSize, NextOffset, NextContentSize)
   end.
