@@ -32,10 +32,27 @@ request(Method, CanonicalUri, CanonicalQueryString, Payload, Scope, Headers) ->
   request(Method, CanonicalUri, CanonicalQueryString, Payload, Region, Scope, Headers).
 
 request(Method, CanonicalUri, CanonicalQueryString, Payload, Region, Scope, Headers) ->
-  Host = <<Scope/binary, ".", Region/binary, ".amazonaws.com">>,
+  Host = host(Scope, Region),
   request(Host, Method, CanonicalUri, CanonicalQueryString, Payload, Region, Scope, Headers).
 
 request(Host, Method, CanonicalUri, CanonicalQueryString, Payload, Region, Scope, Headers) ->
   {ok, ConnPid} = erlaws_utils:http_open(Host, 443),
   Headers2 = erlaws_headers:generate(Host, Method, CanonicalUri, CanonicalQueryString, Payload, Region, Scope, Headers),
   erlaws_utils:http_request(ConnPid, Method, CanonicalUri, Headers2, Payload).
+
+% internals
+
+% https://docs.aws.amazon.com/general/latest/gr/rande.html
+
+host(<<"cloudfront">>, _Region) ->
+  <<"cloudfront.amazonaws.com">>;
+host(<<"globalaccelerator">>, _Region) ->
+  <<"globalaccelerator.amazonaws.com">>;
+host(<<"iam">>, _Region) ->
+  <<"iam.amazonaws.com">>;
+host(<<"route53">>, _Region) ->
+  <<"route53.amazonaws.com">>;
+host(<<"waf">>, _Region) ->
+  <<"waf.amazonaws.com">>;
+host(Scope, Region) ->
+  <<Scope/binary, ".", Region/binary, ".amazonaws.com">>.
