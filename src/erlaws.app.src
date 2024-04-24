@@ -1,15 +1,15 @@
-{application, erlaws,
- [{description, "An OTP application"},
-  {vsn, "0.1.0"},
-  {registered, []},
-  {applications,
-   [kernel,
-    stdlib,
-    hackney
-   ]},
-  {env,[]},
-  {modules, []},
-
-  {licenses, ["Apache 2.0"]},
-  {links, []}
- ]}.
+{application, erlaws, [
+    {description, "An OTP minimal AWS client for erlang"},
+    {vsn, "1.0.0"},
+    {registered, []},
+    {applications, [
+        kernel,
+        stdlib,
+        hackney
+    ]},
+    {included_applications, []},
+    {mod, {erlaws_app, []}},
+    {env, []},
+    {licenses, ["Apache 2.0"]},
+    {links, []}
+]}.

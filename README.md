@@ -1,9 +1,9 @@
 
-# erlaws: AWS client for erlang #
+# erlaws: AWS client for erlang
 
 An AWS client based on `erlaws3` utilizing AWS Signature v4 for doing simple HTTP API requests to Amazon AWS
 
-## Config ##
+## Config
 
 Make sure to define your access/secret keys in the AWS config
 
@@ -16,7 +16,7 @@ Make sure to define your access/secret keys in the AWS config
 ]}
 ```
 
-## Usage ##
+## Usage
 
 Sample Values
 
