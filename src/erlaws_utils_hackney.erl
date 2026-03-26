@@ -4,24 +4,17 @@
 
 -export([
     http_request/7,
-    http_request/8,
-    http_request/9
+    http_request/8
 ]).
 
 http_request(Url, Method, Headers, Options, Payload, RetryCount, ExpectedCodes) ->
-    http_request(Url, Method, Headers, Options, Payload, RetryCount, ExpectedCodes, null, infinity).
+    http_request(Url, Method, Headers, Options, Payload, RetryCount, ExpectedCodes, null).
 
 http_request(Url, Method, Headers, Options, Payload, RetryCount, ExpectedCodes, LogFun) ->
-    http_request(Url, Method, Headers, Options, Payload, RetryCount, ExpectedCodes, LogFun, infinity).
-
-http_request(Url, Method, Headers, Options, Payload, RetryCount, ExpectedCodes, LogFun, MaxLengthBody) ->
 
     try
 
-        {ok, StatusCode, RespHeaders, ClientRef} = hackney:request(Method, Url, Headers, Payload, Options),
-
-        {ok, Body} = hackney:body(ClientRef, MaxLengthBody),
-
+        {ok, StatusCode, RespHeaders, Body} = hackney:request(Method, Url, Headers, Payload, Options),
         case should_retry(StatusCode, ExpectedCodes, RetryCount) of
             true ->
                 run_log_function(LogFun, {status_code, StatusCode, Body}),
@@ -35,7 +28,7 @@ http_request(Url, Method, Headers, Options, Payload, RetryCount, ExpectedCodes, 
             case Term of
                 {bad_response, Status} ->
                     ?ERROR_MSG("http_request unexpected result url: ~p status: ~p payload: ~p retry: ~p", [Url, Status, Payload, RetryCount]),
-                    http_request(Url, Method, Headers, Options, Payload, RetryCount - 1, ExpectedCodes, LogFun, MaxLengthBody);
+                    http_request(Url, Method, Headers, Options, Payload, RetryCount - 1, ExpectedCodes, LogFun);
                 _ ->
                     % workaround for hackney bug. todo: remove this once hackney get fixed
                     CanRetry = case Term of
@@ -62,7 +55,7 @@ http_request(Url, Method, Headers, Options, Payload, RetryCount, ExpectedCodes, 
 
                     case CanRetry andalso RetryCount > 0 of
                         true ->
-                            http_request(Url, Method, Headers, Options, Payload, RetryCount - 1, ExpectedCodes, LogFun, MaxLengthBody);
+                            http_request(Url, Method, Headers, Options, Payload, RetryCount - 1, ExpectedCodes, LogFun);
                         _ ->
                             {error, Term}
                     end
